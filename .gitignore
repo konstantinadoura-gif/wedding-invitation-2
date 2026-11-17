@@ -1,0 +1,6 @@
+# reference photos (not part of the website)
+photos/
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
