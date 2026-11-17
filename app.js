@@ -431,6 +431,7 @@ async function open() {
   startMusic();
   env.setAttribute('aria-expanded', 'true');
   card.classList.remove('dormant');              // other slides start loading now
+  card.style.opacity = '1';                      // (it was faded out when the envelope last closed)
 
   await run(seal, [{ transform: SEAL0, opacity: 1 }, { transform: SEAL1, opacity: 1 }], 380, { easing: 'cubic-bezier(.3,.6,.3,1)' });
   run(seal, [{ transform: SEAL1, opacity: 1 }, { transform: SEAL2, opacity: 0 }], 420);
@@ -494,7 +495,8 @@ async function close() {
   card.style.left = ''; card.style.top = '';
   card.style.transform = inEnvTransform(out);
   run(envWrap, [{ transform: `translateY(${envDy}px)` }, { transform: 'translateY(0px)' }], 640);
-  await run(card, [{ transform: inEnvTransform(out) }, { transform: inEnvTransform(0) }], 760);
+  // the card sinks into the pocket and leaves the shot before the flap starts to close
+  await run(card, [{ transform: inEnvTransform(out), opacity: 1 }, { transform: inEnvTransform(out * .35), opacity: 1, offset: .55 }, { transform: inEnvTransform(0), opacity: 0 }], 760);
 
   setTimeout(() => flap.classList.remove('open'), 380 * SPEED);
   await run(flap, [{ transform: FLAP1 }, { transform: FLAP0 }], 720);
