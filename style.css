@@ -308,3 +308,10 @@ body:not(.intro) .hint { animation: hintIn 1s 1.4s ease backwards; }
 /* more air before "Σας περιμένουμε!" */
 .s-places .box { top: 24%; bottom: 14.5%; }
 .s-places .welcome-gap { display: block; width: 46%; height: calc(var(--u) * 3); margin: calc(var(--u) * 5) auto calc(var(--u) * 3.4); flex: none; }
+
+/* closing: the card darkens from the bottom up as it slides back into the envelope */
+.shade {
+  position: absolute; inset: 0; z-index: 10; pointer-events: none;
+  background: linear-gradient(to top, rgba(40,22,44,.72) 0%, rgba(40,22,44,.42) 40%, rgba(40,22,44,.12) 75%, rgba(40,22,44,0) 100%);
+  transform: translateY(100%); opacity: 0;
+}

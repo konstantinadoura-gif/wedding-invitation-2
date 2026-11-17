@@ -292,7 +292,7 @@ function buildDeck() {
     const [html, end] = s.build();
     s.dur = end + (i < SLIDES.length - 1 ? HOLD : 0);
     return `<section class="slide ${s.cls}${i === 0 ? ' is-active' : ''}" data-i="${i}" aria-hidden="${i ? 'true' : 'false'}">${html}</section>`;
-  }).join('') + '<div class="sheen" aria-hidden="true"></div>';
+  }).join('') + '<div class="sheen" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div>';
   card.querySelectorAll('[data-act="ics"]').forEach(b => b.addEventListener('click', downloadIcs));
   card.querySelectorAll('[data-act="replay"]').forEach(b => b.addEventListener('click', () => go(0)));
 }
@@ -441,6 +441,8 @@ async function open() {
   const r = env.getBoundingClientRect();
   const cardH = L.ch * L.k;
   const peek = -cardH * 0.45;
+  const shade = $('#card .shade');
+  if (shade.style.opacity === '1') run(shade, [{ transform: 'translateY(0%)', opacity: 1 }, { transform: 'translateY(100%)', opacity: 0 }], 1260);
   await run(card, [{ transform: inEnvTransform(0) }, { transform: inEnvTransform(peek) }], 620);
   const out = -(L.inY + cardH) - 4;
   const envDy = Math.max(0, 14 + cardH - r.top);
@@ -485,6 +487,7 @@ async function close() {
   const envDy = Math.max(0, 14 + cardH - er.top);
   const tx = er.left + L.inX - L.fx, ty = er.top + envDy + L.inY + out - L.fy;
   run(envWrap, [{ transform: `translateY(${envDy + L.vh * 0.25}px)`, opacity: 0 }, { transform: `translateY(${envDy}px)`, opacity: 1 }], 700);
+  run($('#card .shade'), [{ transform: 'translateY(100%)', opacity: 0 }, { transform: 'translateY(0%)', opacity: 1 }], 1700, { easing: 'cubic-bezier(.4,0,.3,1)' });
   await run(card, [{ transform: 'translate(0px, 0px) scale(1)' }, { transform: `translate(${tx}px, ${ty}px) scale(${L.k})` }], 720);
 
   slot.appendChild(card);
