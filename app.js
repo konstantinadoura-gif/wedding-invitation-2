@@ -48,7 +48,7 @@ const TEXTS = {
     saveDate: 'Save the date',
     lblCeremony: 'Μυστήριο', lblReception: 'Δεξίωση', lblRsvp: 'Επιβεβαίωση παρουσίας',
     rsvpBy: 'έως {deadline}',
-    btnMap: 'Χάρτης', btnCal: 'Στο ημερολόγιο', icsFile: 'Apple / Outlook (.ics)', replay: 'Ξανά από την αρχή',
+    btnMap: 'Χάρτης', replay: 'Ξανά από την αρχή',
     countdown: 'σε {n} ημέρες', countdown1: 'αύριο!', today: 'σήμερα!',
     welcome: 'Σας περιμένουμε!',
     close: '✕  Κλείσιμο', calEvent: 'Γάμος {bride} & {groom}', photo: 'η φωτογραφία σας',
@@ -62,7 +62,7 @@ const TEXTS = {
     saveDate: 'Save the date',
     lblCeremony: 'Ceremony', lblReception: 'Reception', lblRsvp: 'RSVP',
     rsvpBy: 'by {deadline}',
-    btnMap: 'Map', btnCal: 'Add to calendar', icsFile: 'Apple / Outlook (.ics)', replay: 'Watch again',
+    btnMap: 'Map', replay: 'Watch again',
     countdown: 'in {n} days', countdown1: 'tomorrow!', today: 'today!',
     welcome: 'We hope to see you!',
     close: '✕  Close', calEvent: 'Wedding of {bride} & {groom}', photo: 'your photo',
@@ -260,10 +260,6 @@ const SLIDES = [
         <p class="p label">${tl.words(T.lblRsvp)}</p>
         <ul class="contacts">${c.rsvp.contacts.map(p => `<li class="fx" ${tl.fx(.1)}><span>${esc(p.name)}</span><a href="${esc(tel(p.phone))}">${esc(p.phone)}</a></li>`).join('')}</ul>
         ${V.deadline ? `<p class="p small" style="margin-top:calc(var(--u)*2)">${tl.words(fill(T.rsvpBy))}</p>` : ''}
-      </div>
-      <div class="box bot">
-        <button class="btn fx" ${tl.fx(.2)} type="button" data-act="ics">${esc(T.btnCal)}</button>
-        <a class="linkish ics-file fx" ${tl.fx(.2)} href="wedding.ics" download="wedding.ics">${esc(T.icsFile)}</a>
       </div>`;
     return [html, tl.end];
   } },
@@ -294,42 +290,7 @@ function buildDeck() {
     s.dur = end + (i < SLIDES.length - 1 ? HOLD : 0);
     return `<section class="slide ${s.cls}${i === 0 ? ' is-active' : ''}" data-i="${i}" aria-hidden="${i ? 'true' : 'false'}">${html}</section>`;
   }).join('') + '<div class="sheen" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div>';
-  card.querySelectorAll('[data-act="ics"]').forEach(b => b.addEventListener('click', addToCalendar));
   card.querySelectorAll('[data-act="replay"]').forEach(b => b.addEventListener('click', () => go(0)));
-}
-
-/* ---------------------------------------------------------------
-   ADD TO CALENDAR
-   iPhone/iPad  → opens wedding.ics (Safari shows "Add to Calendar").
-   Android / PC → opens Google Calendar with the event filled in.
-   The small ".ics" link under the button is for Outlook / Apple on PC.
-   ⚠ wedding.ics is a static copy of this event: when the date, time or
-     venues in CONFIG change, update wedding.ics too.
-   --------------------------------------------------------------- */
-function calTimes() {
-  const [h, m] = (CONFIG.time || '18:00').split(':').map(Number);
-  const s = new Date(Y, M, D, h, m || 0), e = new Date(Y, M, D, h + 7, m || 0);
-  const f = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
-  return [f(s), f(e)];
-}
-function calText() {
-  return {
-    title: fill(T.calEvent),
-    where: `${CONFIG.ceremony.name}, ${CONFIG.ceremony.address}`,
-    details: `${T.lblReception}: ${CONFIG.reception.name}, ${CONFIG.reception.address} ${CONFIG.reception.time || ''}`.trim() + `
-${location.origin}${location.pathname}`,
-  };
-}
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-function addToCalendar(e) {
-  e && e.stopPropagation();
-  if (isIOS) { location.href = 'wedding.ics'; return; }
-  const [s, en] = calTimes(), t = calText();
-  const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-    `&text=${encodeURIComponent(t.title)}&dates=${s}/${en}&ctz=Europe/Athens` +
-    `&location=${encodeURIComponent(t.where)}&details=${encodeURIComponent(t.details)}`;
-  const w = window.open(url, '_blank', 'noopener');
-  if (!w) location.href = url;
 }
 
 /* ---------------------------------------------------------------
