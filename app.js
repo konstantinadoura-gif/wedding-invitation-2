@@ -48,7 +48,7 @@ const TEXTS = {
     saveDate: 'Save the date',
     lblCeremony: 'Μυστήριο', lblReception: 'Δεξίωση', lblRsvp: 'Επιβεβαίωση παρουσίας',
     rsvpBy: 'έως {deadline}',
-    btnMap: 'Χάρτης', btnCal: 'Στο ημερολόγιο', replay: 'Ξανά από την αρχή',
+    btnMap: 'Χάρτης', btnCal: 'Στο ημερολόγιο', icsFile: 'Apple / Outlook (.ics)', replay: 'Ξανά από την αρχή',
     countdown: 'σε {n} ημέρες', countdown1: 'αύριο!', today: 'σήμερα!',
     welcome: 'Σας περιμένουμε!',
     close: '✕  Κλείσιμο', calEvent: 'Γάμος {bride} & {groom}', photo: 'η φωτογραφία σας',
@@ -62,7 +62,7 @@ const TEXTS = {
     saveDate: 'Save the date',
     lblCeremony: 'Ceremony', lblReception: 'Reception', lblRsvp: 'RSVP',
     rsvpBy: 'by {deadline}',
-    btnMap: 'Map', btnCal: 'Add to calendar', replay: 'Watch again',
+    btnMap: 'Map', btnCal: 'Add to calendar', icsFile: 'Apple / Outlook (.ics)', replay: 'Watch again',
     countdown: 'in {n} days', countdown1: 'tomorrow!', today: 'today!',
     welcome: 'We hope to see you!',
     close: '✕  Close', calEvent: 'Wedding of {bride} & {groom}', photo: 'your photo',
@@ -263,6 +263,7 @@ const SLIDES = [
       </div>
       <div class="box bot">
         <button class="btn fx" ${tl.fx(.2)} type="button" data-act="ics">${esc(T.btnCal)}</button>
+        <a class="linkish ics-file fx" ${tl.fx(.2)} href="wedding.ics" download="wedding.ics">${esc(T.icsFile)}</a>
       </div>`;
     return [html, tl.end];
   } },
@@ -293,26 +294,42 @@ function buildDeck() {
     s.dur = end + (i < SLIDES.length - 1 ? HOLD : 0);
     return `<section class="slide ${s.cls}${i === 0 ? ' is-active' : ''}" data-i="${i}" aria-hidden="${i ? 'true' : 'false'}">${html}</section>`;
   }).join('') + '<div class="sheen" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div>';
-  card.querySelectorAll('[data-act="ics"]').forEach(b => b.addEventListener('click', downloadIcs));
+  card.querySelectorAll('[data-act="ics"]').forEach(b => b.addEventListener('click', addToCalendar));
   card.querySelectorAll('[data-act="replay"]').forEach(b => b.addEventListener('click', () => go(0)));
 }
 
-function downloadIcs() {
+/* ---------------------------------------------------------------
+   ADD TO CALENDAR
+   iPhone/iPad  → opens wedding.ics (Safari shows "Add to Calendar").
+   Android / PC → opens Google Calendar with the event filled in.
+   The small ".ics" link under the button is for Outlook / Apple on PC.
+   ⚠ wedding.ics is a static copy of this event: when the date, time or
+     venues in CONFIG change, update wedding.ics too.
+   --------------------------------------------------------------- */
+function calTimes() {
   const [h, m] = (CONFIG.time || '18:00').split(':').map(Number);
-  const start = `${Y}${pad(M + 1)}${pad(D)}T${pad(h)}${pad(m || 0)}00`;
-  const endD = new Date(Y, M, D, h + 7, m || 0);
-  const end = `${endD.getFullYear()}${pad(endD.getMonth() + 1)}${pad(endD.getDate())}T${pad(endD.getHours())}${pad(endD.getMinutes())}00`;
-  const escI = s => String(s).replace(/([,;\\])/g, '\\$1');
-  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//wedding-invitation//EN', 'BEGIN:VEVENT',
-    `UID:${start}-${Math.random().toString(36).slice(2)}@wedding`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
-    `DTSTART:${start}`, `DTEND:${end}`, `SUMMARY:${escI(fill(T.calEvent))}`,
-    `LOCATION:${escI(`${CONFIG.ceremony.name}, ${CONFIG.ceremony.address}`)}`,
-    `DESCRIPTION:${escI(`${T.lblReception}: ${CONFIG.reception.name}, ${CONFIG.reception.address} ${CONFIG.reception.time || ''}`)}`,
-    'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
-  a.download = 'wedding.ics'; document.body.appendChild(a); a.click();
-  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  const s = new Date(Y, M, D, h, m || 0), e = new Date(Y, M, D, h + 7, m || 0);
+  const f = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  return [f(s), f(e)];
+}
+function calText() {
+  return {
+    title: fill(T.calEvent),
+    where: `${CONFIG.ceremony.name}, ${CONFIG.ceremony.address}`,
+    details: `${T.lblReception}: ${CONFIG.reception.name}, ${CONFIG.reception.address} ${CONFIG.reception.time || ''}`.trim() + `
+${location.origin}${location.pathname}`,
+  };
+}
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function addToCalendar(e) {
+  e && e.stopPropagation();
+  if (isIOS) { location.href = 'wedding.ics'; return; }
+  const [s, en] = calTimes(), t = calText();
+  const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+    `&text=${encodeURIComponent(t.title)}&dates=${s}/${en}&ctz=Europe/Athens` +
+    `&location=${encodeURIComponent(t.where)}&details=${encodeURIComponent(t.details)}`;
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) location.href = url;
 }
 
 /* ---------------------------------------------------------------
