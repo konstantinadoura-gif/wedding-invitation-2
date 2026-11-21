@@ -317,3 +317,12 @@ body:not(.intro) .hint { animation: hintIn 1s 1.4s ease backwards; }
 }
 /* RSVP card: centre the C&P inside the seal's own laurel ring (the art already has the laurel) */
 .s-rsvp .monogram { top: 9.25%; left: 50.4%; width: 13%; }
+/* invitation card now also carries the date (the separate save-the-date card was removed) */
+.s-invite .box { top: 11%; bottom: 10%; }
+.s-invite .names { font-size: calc(var(--u) * 10); margin: 0 0 calc(var(--u) * 2); }
+.s-invite .orn { margin: calc(var(--u) * 2.4) auto calc(var(--u) * 2); }
+.s-invite .label { font-size: calc(var(--u) * 2.5); letter-spacing: .14em; color: #a3845b; }
+.s-invite .big-day { font-size: calc(var(--u) * 14); line-height: 1; margin-top: calc(var(--u) * 1); text-shadow: 0 1px 0 #fff; }
+.s-invite .month { font-size: calc(var(--u) * 4); letter-spacing: .12em; }
+.s-invite .wkday { font-size: calc(var(--u) * 3); margin-top: calc(var(--u) * .6); }
+.s-invite .count { font-size: calc(var(--u) * 4.4); margin-top: calc(var(--u) * 1.2); }

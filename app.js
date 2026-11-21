@@ -230,19 +230,13 @@ const MONO = `<div class="monogram">${monogramSVG()}</div>`;
 const SLIDES = [
   { cls: 's-invite', bg: 'card-plain.jpg', build() {
     const tl = TL(.6);
+    const n = daysLeft();
+    const count = n < 0 ? '' : n === 0 ? esc(T.today) : n === 1 ? esc(T.countdown1)
+      : esc(T.countdown).replace('{n}', `<b data-n="${n}">0</b>`);
     const html = `<div class="box">
       <p class="p names">${namesHTML(tl)}</p>
       <p class="p body">${tl.words(T.body, .13)}</p>
       ${ORN(tl.fx(.2))}
-    </div>`;
-    return [html, tl.end];
-  } },
-  { cls: 's-date', bg: 'card-ribbon.jpg', build() {
-    const tl = TL(.6);
-    const n = daysLeft();
-    const count = n < 0 ? '' : n === 0 ? esc(T.today) : n === 1 ? esc(T.countdown1)
-      : esc(T.countdown).replace('{n}', `<b data-n="${n}">0</b>`);
-    const html = `${MONO}<div class="box">
       <p class="p label">${tl.words(T.saveDate, .14)}</p>
       <p class="p big-day fx" ${tl.fx(.1)}>${D}</p>
       <p class="p month">${tl.words(monthYear, .16)}</p>
