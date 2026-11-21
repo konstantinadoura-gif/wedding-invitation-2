@@ -248,7 +248,7 @@ const SLIDES = [
   } },
   { cls: 's-rsvp', bg: 'card-mirror.jpg', build() {
     const c = CONFIG, tl = TL(.6);
-    const html = `${MONO}
+    const html = `
       <div class="box oval">
         <p class="p label">${tl.words(T.lblRsvp)}</p>
         <ul class="contacts">${c.rsvp.contacts.map(p => `<li class="fx" ${tl.fx(.1)}><span>${esc(p.name)}</span><a href="${esc(tel(p.phone))}">${esc(p.phone)}</a></li>`).join('')}</ul>
@@ -258,7 +258,7 @@ const SLIDES = [
   } },
   { cls: 's-places', bg: 'card-details.jpg', build() {
     const c = CONFIG, tl = TL(.6);
-    const html = `${MONO}<div class="box">
+    const html = `<div class="box">
       <p class="p label">${tl.words(T.lblCeremony)}</p>
       <p class="p place">${tl.words(c.ceremony.name)}</p>
       <p class="p small">${tl.words(`${c.ceremony.address} · ${c.time}`)}</p>
