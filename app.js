@@ -403,7 +403,7 @@ const SEAL0 = 'translateY(0%) scale(1) rotate(0deg)', SEAL1 = 'translateY(-9%) s
 let state = 'closed';
 
 async function open() {
-  if (state !== 'closed' || document.body.classList.contains('intro')) return;
+  if (state !== 'closed') return;
   state = 'opening';
   hint.classList.add('gone');
   startMusic();
@@ -490,28 +490,6 @@ function relayout() {
   layout();
   if (state === 'closed') card.style.transform = inEnvTransform(0);
   else { card.style.left = `${L.fx}px`; card.style.top = `${L.fy}px`; }
-}
-
-/* ---------------------------------------------------------------
-   OPENING TITLES
-   --------------------------------------------------------------- */
-let introDone = false, introTimer = 0;
-function intro() {
-  const tl = TL(.3);
-  const el = $('#intro');
-  el.innerHTML = `<p class="it-kicker">${tl.words(T.kicker, .16)}</p>
-    <h1 class="it-names">${namesHTML(tl)}</h1>
-    <p class="it-date">${tl.words(`${pad(D)} · ${pad(M + 1)} · ${Y}`, .2)}</p>`;
-  const begin = () => { el.classList.add('play'); introTimer = setTimeout(endIntro, (tl.end + 1.3) * 1000); };
-  // wait for the script font so the letters don't flash in a fallback face
-  Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), wait(1500)]).then(begin);
-  addEventListener('pointerdown', endIntro, { once: true });
-  addEventListener('keydown', endIntro, { once: true });
-}
-function endIntro() {
-  if (introDone) return;
-  introDone = true; clearTimeout(introTimer);
-  document.body.classList.remove('intro');
 }
 
 /* ---------------------------------------------------------------
@@ -610,7 +588,6 @@ layout();
 card.style.transform = inEnvTransform(0);
 initMusic();
 startPetals();   // petals fall from the very start, before the envelope
-intro();
 
 env.addEventListener('click', open);
 env.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
