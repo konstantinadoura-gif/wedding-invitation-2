@@ -231,7 +231,6 @@ const SLIDES = [
   { cls: 's-invite', bg: 'card-plain.jpg', build() {
     const tl = TL(.6);
     const html = `<div class="box">
-      <p class="p lead">${tl.words(T.lead, .14)}</p>
       <p class="p names">${namesHTML(tl)}</p>
       <p class="p body">${tl.words(T.body, .13)}</p>
       ${ORN(tl.fx(.2))}
