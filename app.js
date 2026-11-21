@@ -195,22 +195,22 @@ function mirrorSVG() {
 }
 
 function monogramSVG() {
-  const mono = esc(CONFIG.monogram || (CONFIG.bride[0] + CONFIG.groom[0]));
-  const a = mono[0] || '', b = mono.slice(1);
-  let laurel = '';
-  for (const side of [-1, 1]) {
-    laurel += `<path d="M50 106 Q${50 + side * 46} 90 ${50 + side * 36} 20" fill="none" stroke-width="1.3"/>`;
-    for (let i = 0; i < 8; i++) {
-      const t = i / 8, y = 98 - t * 72, x = 50 + side * (12 + 30 * Math.sin(Math.PI * (0.18 + t * .6)));
-      laurel += `<ellipse cx="${r2(x + side * 4)}" cy="${r2(y)}" rx="2.2" ry="5.6" transform="rotate(${r2(side * (45 - t * 30))} ${r2(x + side * 4)} ${r2(y)})"/>`;
-      laurel += `<ellipse cx="${r2(x - side * 3.5)}" cy="${r2(y - 3)}" rx="2" ry="5" transform="rotate(${r2(side * (-15 - t * 10))} ${r2(x - side * 3.5)} ${r2(y - 3)})"/>`;
-    }
+  // a single flower pressed into the wax (five petals and a small heart)
+  const cx = 50, cy = 58;
+  let petals = '';
+  for (let i = 0; i < 5; i++) {
+    const ang = i * 72;
+    petals += `<ellipse cx="${cx}" cy="${cy - 15}" rx="9.5" ry="15" transform="rotate(${ang} ${cx} ${cy})"/>`;
   }
-  const txt = `<text x="50" y="70" text-anchor="middle" font-family="Pinyon Script, Parisienne, cursive" font-size="36">${a}<tspan font-size="22" dy="-3">&amp;</tspan><tspan dy="3">${b}</tspan></text>`;
-  const art = `${laurel}${txt}`;
+  const heart = `<circle cx="${cx}" cy="${cy}" r="6.5"/>`;
+  const dots = [0, 72, 144, 216, 288].map(a => {
+    const r = (a - 36) * Math.PI / 180;
+    return `<circle cx="${r2(cx + Math.sin(r) * 10.5)}" cy="${r2(cy - Math.cos(r) * 10.5)}" r="1.3"/>`;
+  }).join('');
   return `<svg viewBox="0 0 100 116" aria-hidden="true">
-    <g fill="#7f4a68" stroke="#7f4a68" fill-opacity=".5" stroke-opacity=".45" transform="translate(.8 1.1)">${art}</g>
-    <g fill="#fbe9f1" stroke="#fbe9f1" fill-opacity=".92" stroke-opacity=".85">${art}</g>
+    <g fill="#7f4a68" fill-opacity=".45" transform="translate(.8 1.1)">${petals}${heart}</g>
+    <g fill="#fbe9f1" fill-opacity=".9" stroke="#c9a6bb" stroke-width=".8" stroke-opacity=".7">${petals}</g>
+    <g fill="#f3d9b0" fill-opacity=".95">${heart}${dots}</g>
   </svg>`;
 }
 const ORN = s => `<svg class="orn fx" ${s} viewBox="0 0 200 20" aria-hidden="true"><path d="M10 10 H82 M118 10 H190" stroke="#a98fa6" stroke-width="1.2"/><path d="M100 3 L106 10 L100 17 L94 10 Z" fill="none" stroke="#b79a72" stroke-width="1.2"/><circle cx="88" cy="10" r="2" fill="#b79a72"/><circle cx="112" cy="10" r="2" fill="#b79a72"/></svg>`;

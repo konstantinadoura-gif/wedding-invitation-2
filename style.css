@@ -317,4 +317,3 @@ body:not(.intro) .hint { animation: hintIn 1s 1.4s ease backwards; }
 }
 /* RSVP card: centre the C&P inside the seal's own laurel ring (the art already has the laurel) */
 .s-rsvp .monogram { top: 9.25%; left: 50.4%; width: 13%; }
-.s-rsvp .monogram ellipse, .s-rsvp .monogram path { display: none; }
